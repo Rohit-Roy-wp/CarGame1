@@ -1,11 +1,94 @@
-<!-- Created by the silent aura -->
-
+<!-- DRIFT KING WITH DESERT ENVIRONMENT - COMPLETE FIXED -->
 
 <!DOCTYPE html>
 <html>
 <head>
     <style>
-        body { margin: 0; overflow: hidden; background: #61666c; touch-action: none; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; background: #FFD580; touch-action: none; font-family: sans-serif; }
+        
+        /* --- INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 1; transition: opacity 0.5s;
+        }
+        #intro-screen.hidden { opacity: 0; pointer-events: none; }
+        
+        .intro-content {
+            text-align: center; color: white; animation: fadeInUp 1s ease-out;
+        }
+        
+        .game-title {
+            font-size: 72px; font-weight: bold; margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ccff, #ff00ff, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px #00ccff;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        .game-subtitle {
+            font-size: 28px; margin-bottom: 40px; color: #00ccff;
+            text-shadow: 0 0 15px #00ccff;
+            letter-spacing: 3px;
+        }
+        
+        .environment-selector {
+            display: flex; gap: 15px; justify-content: center; margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .env-btn {
+            padding: 15px 30px; font-size: 16px; font-weight: bold;
+            background: rgba(255, 255, 255, 0.1); border: 2px solid #00ccff;
+            color: #00ccff; border-radius: 25px; cursor: pointer;
+            transition: all 0.3s; text-transform: uppercase;
+        }
+        
+        .env-btn:hover {
+            background: rgba(0, 204, 255, 0.2);
+            box-shadow: 0 0 20px #00ccff;
+        }
+        
+        .env-btn.active {
+            background: #00ccff;
+            color: #000;
+        }
+        
+        .controls-info {
+            font-size: 16px; margin-bottom: 50px; line-height: 2;
+            color: #aaa; max-width: 600px;
+        }
+        
+        .controls-info strong { color: #00ff00; }
+        
+        .start-btn {
+            padding: 20px 60px; font-size: 24px; font-weight: bold;
+            background: linear-gradient(45deg, #00ccff, #00ff88);
+            color: #000; border: none; border-radius: 50px;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 0 30px #00ccff;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px #00ccff, 0 0 30px #00ff88;
+        }
+        
+        .start-btn:active { transform: scale(0.95); }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px #00ccff); }
+            50% { filter: drop-shadow(0 0 30px #ff00ff); }
+        }
+        
         #controls {
             position: absolute; bottom: 20px; width: 100%;
             display: flex; justify-content: space-between; box-sizing: border-box; padding: 0 40px; pointer-events: none;
@@ -17,7 +100,9 @@
             align-items: center; justify-content: center; font-weight: bold; font-size: 20px;
             color: white; user-select: none; pointer-events: auto; cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transition: all 0.2s;
         }
+        .btn:hover { box-shadow: 0 6px 20px rgba(255,255,255,0.3); }
         .btn-pedal { border-radius: 14px; width: 60px; height: 100px; font-size: 16px; }
         .btn:active, .ui-panel-btn:active, .gear-notch:active { background: rgba(255, 255, 255, 0.8); color: black; }
         
@@ -78,6 +163,34 @@
             font-size: 9px; color: #888; letter-spacing: 1px; font-weight: bold;
         }
         
+        /* --- HUD DISPLAY --- */
+        #hud-container {
+            position: absolute; top: 110px; right: 20px;
+            display: flex; flex-direction: column; gap: 15px; pointer-events: auto;
+        }
+
+        #drift-display, #nitro-display, #stats-display, #env-display {
+            background: rgba(0, 0, 0, 0.7); border: 2px solid #00ff00;
+            border-radius: 8px; padding: 12px 15px; color: #00ff00;
+            font-family: monospace; font-size: 12px; text-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 4px 15px rgba(0,255,0,0.3);
+        }
+
+        #drift-display { border-color: #ff00ff; color: #ff00ff; text-shadow: 0 0 10px #ff00ff; box-shadow: 0 4px 15px rgba(255,0,255,0.3); }
+        #nitro-display { border-color: #00ccff; color: #00ccff; text-shadow: 0 0 10px #00ccff; box-shadow: 0 4px 15px rgba(0,204,255,0.3); }
+        #env-display { border-color: #ffaa00; color: #ffaa00; text-shadow: 0 0 10px #ffaa00; box-shadow: 0 4px 15px rgba(255,170,0,0.3); }
+
+        #nitro-bar {
+            width: 120px; height: 8px; background: rgba(0,0,0,0.5); 
+            border: 1px solid #00ccff; border-radius: 4px; margin-top: 5px;
+            overflow: hidden;
+        }
+        #nitro-bar-fill {
+            height: 100%; background: linear-gradient(90deg, #00ccff, #0099ff);
+            width: 0%; transition: width 0.1s;
+            box-shadow: 0 0 10px #00ccff;
+        }
+
         /* --- TOP RIGHT BUTTON CONTROLS STACK --- */
         #top-right-ui {
             position: absolute; top: 20px; right: 20px;
@@ -94,15 +207,109 @@
         .ui-panel-btn.active-panel {
             background: #ffcc00; color: #000; border-color: #fff;
         }
+
+        /* --- NITRO BOOST BUTTON --- */
+        #btn-nitro {
+            width: 70px; height: 70px; background: rgba(0, 150, 255, 0.6);
+            border: 2px solid #00ccff; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: bold; font-size: 16px;
+            color: #00ccff; user-select: none; pointer-events: auto; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,150,255,0.4); transition: all 0.2s;
+            text-align: center; line-height: 1.2;
+        }
+        #btn-nitro:active { background: rgba(0, 255, 255, 0.9); box-shadow: 0 0 20px #00ccff; }
+
+        /* --- SPEEDOMETER REDLINE WARNING --- */
+        #redline-warning {
+            position: absolute; bottom: 5px; width: 100%; text-align: center;
+            font-size: 10px; color: #ff3333; font-weight: bold;
+            text-shadow: 0 0 5px #ff3333; opacity: 0;
+            transition: opacity 0.2s;
+        }
+        #redline-warning.active { opacity: 1; }
+
+        /* --- DRIFT COMBO MULTIPLIER --- */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        #combo-multiplier {
+            position: absolute; top: 180px; left: 80px;
+            font-size: 24px; font-weight: bold; color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
+            pointer-events: none; user-select: none;
+            animation: pulse 0.3s ease-out;
+            opacity: 0;
+        }
+        
+        /* --- SOUND TOGGLE --- */
+        #sound-toggle {
+            position: absolute; top: 20px; left: 180px;
+            width: 60px; height: 60px; background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffcc00; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #ffcc00; font-size: 28px; cursor: pointer;
+            pointer-events: auto; transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.4);
+        }
+        #sound-toggle:hover { box-shadow: 0 0 20px #ffcc00; }
+        #sound-toggle.muted { opacity: 0.4; }
     </style>
 </head>
 <body>
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen">
+        <div class="intro-content">
+            <div class="game-title">🏎️ DRIFT KING 🏎️</div>
+            <div class="game-subtitle">DRIFT RACING</div>
+            
+            <div style="margin-bottom: 30px;">
+                <div style="color: #00ff00; font-size: 18px; margin-bottom: 15px;">SELECT ENVIRONMENT:</div>
+                <div class="environment-selector">
+                    <button class="env-btn active" data-env="snow">❄️ Snow</button>
+                    <button class="env-btn" data-env="desert">🏜️ Desert</button>
+                    <button class="env-btn" data-env="seaside">🌊 Seaside</button>
+                </div>
+            </div>
+            
+            <div class="controls-info">
+                <div><strong>WASD / Arrow Keys</strong> - Move</div>
+                <div><strong>E/Q/S</strong> - Gear D/N/R</div>
+                <div><strong>X</strong> - Nitro Boost</div>
+                <div><strong>C</strong> - Change Camera</div>
+                <div><strong>H</strong> - Toggle Lights</div>
+                <div style="margin-top: 20px; color: #00ff00;">Drift & Earn Points!</div>
+            </div>
+            <button class="start-btn" id="start-game-btn">START GAME</button>
+        </div>
+    </div>
+
     <div id="speedometer-container">
         <div id="clock-face">
             <div id="clock-needle"></div>
             <div id="clock-center"></div>
             <div id="digital-display"><span id="speed-num">0</span></div>
             <div id="unit-label">KM/H</div>
+            <div id="redline-warning">⚠ REDLINE</div>
+        </div>
+    </div>
+
+    <div id="hud-container">
+        <div id="env-display">
+            Env: <span id="env-name">SNOW</span>
+        </div>
+        <div id="drift-display">
+            Drift: <span id="drift-points">0</span>pts<br>
+            Combo: <span id="drift-combo">x1.0</span>
+        </div>
+        <div id="nitro-display">
+            NITRO<br>
+            <div id="nitro-bar"><div id="nitro-bar-fill"></div></div>
+            <span id="nitro-status">Ready</span>
+        </div>
+        <div id="stats-display">
+            Distance: <span id="stat-distance">0</span>km<br>
+            Time: <span id="stat-time">00:00</span>
         </div>
     </div>
 
@@ -110,6 +317,9 @@
         <div id="cam-toggle" class="ui-panel-btn">Cam: Back</div>
         <div id="btn-lights-toggle" class="ui-panel-btn">Lights: OFF</div>
     </div>
+
+    <div id="sound-toggle" onclick="window.toggleSound()">🔊</div>
+    <div id="combo-multiplier"></div>
     
     <div id="controls">
         <div class="control-group">
@@ -118,6 +328,7 @@
         </div>
         <div class="control-group">
             <div id="btn-gas" class="btn btn-pedal">GAS</div>
+            <div id="btn-nitro" class="btn">NITRO<br>N</div>
             
             <div id="gear-container">
                 <div id="gear-d" class="gear-notch active-gear">D</div>
@@ -132,6 +343,200 @@
     </script>
     <script type="module">
         import * as THREE from 'three';
+
+        // Global functions
+        window.soundEnabled = true;
+        window.gameStarted = false;
+        window.selectedEnvironment = 'snow';
+
+        // Environment selector
+        document.querySelectorAll('.env-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.env-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                window.selectedEnvironment = this.dataset.env;
+            });
+        });
+
+        window.startGame = function() {
+            const introScreen = document.getElementById('intro-screen');
+            introScreen.classList.add('hidden');
+            window.gameStarted = true;
+            playBackgroundMusic();
+        };
+
+        window.toggleSound = function() {
+            window.soundEnabled = !window.soundEnabled;
+            const soundToggle = document.getElementById('sound-toggle');
+            soundToggle.classList.toggle('muted');
+            soundToggle.textContent = window.soundEnabled ? '🔊' : '🔇';
+            if (window.soundEnabled) {
+                if (window.audioCtxInitialized && window.mainGain) window.mainGain.gain.value = 1.0;
+            } else {
+                if (window.audioCtxInitialized && window.mainGain) window.mainGain.gain.value = 0;
+            }
+        };
+
+        document.getElementById('start-game-btn').addEventListener('click', window.startGame);
+
+        // --- ENVIRONMENT CONFIGS ---
+        const ENVIRONMENTS = {
+            snow: {
+                skyColor: 0x61666c,
+                fogColor: 0x61666c,
+                groundColor: 0xd0d8e0,
+                roadColor: 0x2a2e33,
+                lightIntensity: 0.9,
+                lightColor: 0xffffff,
+                ambientColor: 0xaabbcc,
+                ambientIntensity: 0.8,
+                hemisphereColor: 0xaabbcc,
+                hemisphereGroundColor: 0x888888,
+                particles: 'snow',
+                particleCount: 650,
+                particleVelY: 0.15,
+                particleOpacity: 0.85,
+                particleColor: 0xffffff,
+                particleSize: 0.38,
+                name: 'SNOW'
+            },
+            desert: {
+                skyColor: 0xFFB366,
+                fogColor: 0xFFD580,
+                groundColor: 0xE8BF5C,
+                roadColor: 0x8B7355,
+                lightIntensity: 1.2,
+                lightColor: 0xFFE6B3,
+                ambientColor: 0xFFCC99,
+                ambientIntensity: 1.0,
+                hemisphereColor: 0xFFCC99,
+                hemisphereGroundColor: 0xE8BF5C,
+                particles: 'sand',
+                particleCount: 400,
+                particleVelY: 0.05,
+                particleOpacity: 0.4,
+                particleColor: 0xF4A460,
+                particleSize: 0.25,
+                name: 'DESERT'
+            },
+            seaside: {
+                skyColor: 0x87CEEB,
+                fogColor: 0xA8D8FF,
+                groundColor: 0xC2B280,
+                roadColor: 0x666666,
+                lightIntensity: 0.95,
+                lightColor: 0xFFFFDD,
+                ambientColor: 0x87CEEB,
+                ambientIntensity: 0.9,
+                hemisphereColor: 0x87CEEB,
+                hemisphereGroundColor: 0xFFFFDD,
+                particles: 'seagulls',
+                particleCount: 50,
+                particleVelY: 0.1,
+                particleOpacity: 0.6,
+                particleColor: 0xffffff,
+                particleSize: 0.5,
+                name: 'SEASIDE'
+            }
+        };
+
+        // --- AUDIO SYNTHESIZER ---
+        window.audioCtxInitialized = false;
+        let engineOsc, engineGain, driftOsc, driftGain, nitroOsc, nitroGain;
+        let mainGain, audioListener, audioCtx;
+        let backgroundOsc, backgroundGain;
+
+        function playBackgroundMusic() {
+            if (!window.audioCtxInitialized) return;
+            try {
+                backgroundOsc = audioCtx.createOscillator();
+                backgroundGain = audioCtx.createGain();
+                
+                backgroundOsc.type = 'sine';
+                backgroundOsc.frequency.setValueAtTime(130, audioCtx.currentTime);
+                backgroundGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                
+                const bassFilter = audioCtx.createBiquadFilter();
+                bassFilter.type = 'lowpass';
+                bassFilter.frequency.value = 200;
+                
+                backgroundOsc.connect(bassFilter);
+                bassFilter.connect(backgroundGain);
+                backgroundGain.connect(mainGain);
+                backgroundOsc.start();
+                
+                const now = audioCtx.currentTime;
+                for (let i = 0; i < 20; i++) {
+                    const time = now + (i * 0.5);
+                    backgroundOsc.frequency.setValueAtTime(130 - (i % 2 * 30), time);
+                }
+            } catch(e) {}
+        }
+
+        function initAudio() {
+            if (window.audioCtxInitialized) return;
+            
+            if (!audioListener) {
+                audioListener = new THREE.AudioListener();
+            }
+            
+            const ctx = audioListener.context || new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = ctx;
+            if (ctx.state === 'suspended') ctx.resume();
+            
+            try {
+                mainGain = ctx.createGain();
+                mainGain.gain.value = window.soundEnabled ? 1.0 : 0;
+                mainGain.connect(ctx.destination);
+                window.mainGain = mainGain;
+
+                engineOsc = ctx.createOscillator();
+                engineGain = ctx.createGain();
+                engineOsc.type = 'sawtooth';
+                engineOsc.frequency.value = 40; 
+                engineGain.gain.value = 0.05;    
+                
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 100;
+                engineOsc.connect(filter);
+                filter.connect(engineGain);
+                engineGain.connect(mainGain);
+                engineOsc.start(0);
+
+                driftOsc = ctx.createOscillator();
+                driftGain = ctx.createGain();
+                driftOsc.type = 'triangle';
+                driftOsc.frequency.value = 400; 
+                driftGain.gain.value = 0; 
+                const driftFilter = ctx.createBiquadFilter();
+                driftFilter.type = 'bandpass';
+                driftFilter.frequency.value = 400;
+                driftOsc.connect(driftFilter);
+                driftFilter.connect(driftGain);
+                driftGain.connect(mainGain);
+                driftOsc.start(0);
+
+                nitroOsc = ctx.createOscillator();
+                nitroGain = ctx.createGain();
+                nitroOsc.type = 'sine';
+                nitroOsc.frequency.value = 800;
+                nitroGain.gain.value = 0;
+                nitroOsc.connect(nitroGain);
+                nitroGain.connect(mainGain);
+                nitroOsc.start(0);
+
+                window.audioCtxInitialized = true;
+                window.engineOsc = engineOsc;
+                window.engineGain = engineGain;
+                window.driftOsc = driftOsc;
+                window.driftGain = driftGain;
+                window.nitroOsc = nitroOsc;
+                window.nitroGain = nitroGain;
+
+                if (window.gameStarted) playBackgroundMusic();
+            } catch(e) { console.warn("Audio Context blocked."); }
+        }
 
         // --- Generate Gauge Dial Lines ---
         const clockFace = document.getElementById('clock-face');
@@ -156,97 +561,102 @@
             clockFace.appendChild(tickElement);
         }
 
-        // --- Scene Setup --- //
+        // --- DYNAMIC SCENE SETUP ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x61666c); 
-        scene.fog = new THREE.Fog(0x61666c, 40, 160);  
-
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'highp', powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFShadowShadowMap;
         document.body.appendChild(renderer.domElement);
 
-        const light = new THREE.DirectionalLight(0xffffff, 0.85);
-        light.position.set(20, 50, 20);
-        scene.add(light, new THREE.AmbientLight(0x7c8186, 0.7));
+        audioListener && camera.add(audioListener);
 
-        // --- MODERATE INFINITE VIEWPORT-BOUND SNOWFALL MATRIX ---
-        const snowCount = 650; 
-        const snowGeometry = new THREE.BufferGeometry();
-        const snowPositions = new Float32Array(snowCount * 3);
-        const snowVelocities = [];
+        // --- IMPROVED LIGHTING SYSTEM (DEFINED FIRST) ---
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        directionalLight.position.set(30, 60, 30);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.left = -100;
+        directionalLight.shadow.camera.right = 100;
+        directionalLight.shadow.camera.top = 100;
+        directionalLight.shadow.camera.bottom = -100;
+        directionalLight.shadow.camera.far = 200;
+        scene.add(directionalLight);
+
+        const ambientLight = new THREE.AmbientLight(0xaabbcc, 0.8);
+        scene.add(ambientLight);
+
+        const hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0xffffff, 0.4);
+        scene.add(hemisphereLight);
+
+        // --- PARTICLE SYSTEM (DECLARED EARLY) ---
+        let currentEnv = ENVIRONMENTS[window.selectedEnvironment];
+        let particleCount = currentEnv.particleCount;
+        const particleGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        const particleVelocities = [];
         
-        const snowCoverageWidth = 140; 
-        const snowCeilingHeight = 90;  
+        const particleCoverageWidth = 140; 
+        const particleCeilingHeight = 90;
 
-        for (let i = 0; i < snowCount; i++) {
-            snowPositions[i * 3] = (Math.random() - 0.5) * snowCoverageWidth;
-            snowPositions[i * 3 + 1] = Math.random() * snowCeilingHeight;
-            snowPositions[i * 3 + 2] = (Math.random() - 0.5) * snowCoverageWidth;
+        for (let i = 0; i < particleCount; i++) {
+            particlePositions[i * 3] = (Math.random() - 0.5) * particleCoverageWidth;
+            particlePositions[i * 3 + 1] = Math.random() * particleCeilingHeight;
+            particlePositions[i * 3 + 2] = (Math.random() - 0.5) * particleCoverageWidth;
             
-            snowVelocities.push({
-                y: 0.15 + Math.random() * 0.22, 
-                x: (Math.random() - 0.5) * 0.04,
-                z: (Math.random() - 0.5) * 0.04
+            particleVelocities.push({
+                y: currentEnv.particleVelY + Math.random() * 0.1,
+                x: currentEnv.particles === 'sand' ? (Math.random() - 0.5) * 0.08 : (Math.random() - 0.5) * 0.04,
+                z: currentEnv.particles === 'sand' ? (Math.random() - 0.5) * 0.08 : (Math.random() - 0.5) * 0.04
             });
         }
 
-        snowGeometry.setAttribute('position', new THREE.BufferAttribute(snowPositions, 3));
-        const snowMaterial = new THREE.PointsMaterial({
-            color: 0xffffff,
-            size: 0.38,
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+        const particleMaterial = new THREE.PointsMaterial({
+            color: currentEnv.particleColor,
+            size: currentEnv.particleSize,
             transparent: true,
-            opacity: 0.85
+            opacity: currentEnv.particleOpacity,
+            sizeAttenuation: true
         });
-        const snowParticles = new THREE.Points(snowGeometry, snowMaterial);
+        const particles = new THREE.Points(particleGeometry, particleMaterial);
         
-        snowParticles.frustumCulled = false;
-        scene.add(snowParticles);
+        particles.frustumCulled = false;
+        scene.add(particles);
 
-        // --- AUDIO SYNTHESIZER SETUP ---
-        const audioListener = new THREE.AudioListener();
-        camera.add(audioListener);
-
-        let audioCtxInitialized = false;
-        let engineOsc, engineGain, driftOsc, driftGain;
-
-        function initAudio() {
-            if (audioCtxInitialized) return;
-            const ctx = audioListener.context;
-            if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
-            try {
-                engineOsc = ctx.createOscillator();
-                engineGain = ctx.createGain();
-                engineOsc.type = 'sawtooth';
-                engineOsc.frequency.value = 40; 
-                engineGain.gain.value = 0.05;    
-                
-                const filter = ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 100;
-                engineOsc.connect(filter);
-                filter.connect(engineGain);
-                engineGain.connect(ctx.destination);
-                engineOsc.start(0);
-
-                driftOsc = ctx.createOscillator();
-                driftGain = ctx.createGain();
-                driftOsc.type = 'triangle';
-                driftOsc.frequency.value = 400; 
-                driftGain.gain.value = 0; 
-                const driftFilter = ctx.createBiquadFilter();
-                driftFilter.type = 'bandpass';
-                driftFilter.frequency.value = 400;
-                driftOsc.connect(driftFilter);
-                driftFilter.connect(driftGain);
-                driftGain.connect(ctx.destination);
-                driftOsc.start(0);
-
-                audioCtxInitialized = true;
-            } catch(e) { console.warn("Audio Context blocked."); }
+        // Function to update environment
+        function updateEnvironment(envName) {
+            const env = ENVIRONMENTS[envName];
+            scene.background = new THREE.Color(env.skyColor);
+            scene.fog = new THREE.Fog(env.fogColor, 40, 160);
+            
+            // Update lighting
+            directionalLight.color.setHex(env.lightColor);
+            directionalLight.intensity = env.lightIntensity;
+            ambientLight.color.setHex(env.ambientColor);
+            ambientLight.intensity = env.ambientIntensity;
+            
+            // Fix: HemisphereLight colors ko properly set karo
+            hemisphereLight.color.setHex(env.hemisphereColor);
+            hemisphereLight.groundColor.setHex(env.hemisphereGroundColor);
+            
+            // Update particle material
+            particleMaterial.color.setHex(env.particleColor);
+            particleMaterial.size = env.particleSize;
+            particleMaterial.opacity = env.particleOpacity;
+            
+            // Update environment display
+            document.getElementById('env-name').textContent = env.name;
+            
+            return env;
         }
+
+        // Initialize with selected environment
+        updateEnvironment(window.selectedEnvironment);
 
         // --- PROCEDURAL 2D INFINITE WORLD CHUNKS ---
         const chunks = new Map();
@@ -254,60 +664,144 @@
         const renderDistance = 2; 
 
         const grassGeo = new THREE.PlaneGeometry(chunkSize, chunkSize);
-        const grassMat = new THREE.MeshStandardMaterial({ color: 0xe8ecef, roughness: 0.95, metalness: 0.05 });
+        const grassMat = new THREE.MeshStandardMaterial({ 
+            color: currentEnv.groundColor,
+            roughness: 0.9, 
+            metalness: 0.05,
+            side: THREE.DoubleSide
+        });
+
         const roadZGeo = new THREE.PlaneGeometry(14, chunkSize);
         const roadXGeo = new THREE.PlaneGeometry(chunkSize, 14);
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3d4043, roughness: 0.90 }); 
+        const roadMat = new THREE.MeshStandardMaterial({ 
+            color: currentEnv.roadColor,
+            roughness: 0.85,
+            metalness: 0.1,
+            side: THREE.DoubleSide
+        });
+
         const lineGeo = new THREE.PlaneGeometry(0.5, 4);
-        const lineMat = new THREE.MeshBasicMaterial({ color: 0xd2d7db });
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.8, transparent: true });
         const zebraStripeGeo = new THREE.PlaneGeometry(1.2, 5); 
-        const zebraStripeMat = new THREE.MeshBasicMaterial({ color: 0xced2d6 });
+        const zebraStripeMat = new THREE.MeshBasicMaterial({ color: 0xf5f5f5, opacity: 0.9, transparent: true });
 
         const activeTraffic = [];
 
-        function createTree() {
+        function createTree(env) {
             const tree = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 2), new THREE.MeshStandardMaterial({color: 0x3a2e2b}));
-            const leaves = new THREE.Mesh(new THREE.ConeGeometry(2, 4, 4), new THREE.MeshStandardMaterial({color: 0x1d3027, roughness: 0.9, flatShading: true}));
-            leaves.position.y = 2.5;
             
-            const snowCrest = new THREE.Mesh(new THREE.ConeGeometry(2.05, 1.5, 4), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.9}));
-            snowCrest.position.y = 3.8;
+            let trunkColor = 0x4a3728;
+            let leavesColor = 0x1a5c1a;
+            let snowColor = 0xfafafa;
+            
+            if (env === 'desert') {
+                leavesColor = 0x6B8E23;
+                trunkColor = 0x8B7355;
+                snowColor = 0xE8BF5C;
+            } else if (env === 'seaside') {
+                leavesColor = 0x228B22;
+                trunkColor = 0x654321;
+                snowColor = 0xE8E8E8;
+            }
+            
+            const trunk = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.35, 0.4, 2.5, 8),
+                new THREE.MeshStandardMaterial({
+                    color: trunkColor,
+                    roughness: 0.8
+                })
+            );
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+
+            const leaves = new THREE.Mesh(
+                new THREE.ConeGeometry(2.2, 4, 8),
+                new THREE.MeshStandardMaterial({
+                    color: leavesColor,
+                    roughness: 0.9
+                })
+            );
+            leaves.position.y = 2.8;
+            leaves.castShadow = true;
+            leaves.receiveShadow = true;
+            
+            const snowCrest = new THREE.Mesh(
+                new THREE.ConeGeometry(2.25, 1.8, 8),
+                new THREE.MeshStandardMaterial({
+                    color: snowColor,
+                    roughness: 0.7
+                })
+            );
+            snowCrest.position.y = 4.2;
+            snowCrest.castShadow = true;
+            snowCrest.receiveShadow = true;
             
             tree.add(trunk, leaves, snowCrest);
             tree.position.y = 1;
             return tree;
         }
 
-        function createHouse() {
+        function createHouse(env) {
             const houseGroup = new THREE.Group();
-            const wallColors = [0xc2c7cc, 0xa9afb5, 0x858a8f, 0xfafafa, 0xd2d7dc];
+            
+            let wallColors, roofColors;
+            if (env === 'desert') {
+                wallColors = [0xD2B48C, 0xCD853F, 0xDEB887, 0xF0E68C, 0xEEE8AA];
+                roofColors = [0x8B4513, 0xA0522D, 0x8B6914, 0xB8860B];
+            } else if (env === 'seaside') {
+                wallColors = [0xFFFFFF, 0xF0F8FF, 0xE0FFFF, 0xFFFACD, 0xFFE4B5];
+                roofColors = [0xFF6347, 0xFF7F50, 0xFF8C00, 0xFFD700];
+            } else {
+                wallColors = [0xd4a574, 0xb8956a, 0xa0826d, 0xf5e6d3, 0xdaa555];
+                roofColors = [0x5c4033, 0x4a3728, 0x3e2723, 0x6b4423];
+            }
+            
             const wallColor = wallColors[Math.floor(Math.random() * wallColors.length)];
-            const roofColors = [0x42464a, 0x323538, 0x222426, 0x544747];
             const roofColor = roofColors[Math.floor(Math.random() * roofColors.length)];
 
             const wallGeo = new THREE.BoxGeometry(6, 4, 6);
-            const wallMat = new THREE.MeshStandardMaterial({ color: wallColor, roughness: 0.8 }); 
+            const wallMat = new THREE.MeshStandardMaterial({ 
+                color: wallColor, 
+                roughness: 0.8,
+                metalness: 0.05
+            });
             const walls = new THREE.Mesh(wallGeo, wallMat);
+            walls.castShadow = true;
+            walls.receiveShadow = true;
             walls.position.y = 2; 
             houseGroup.add(walls);
 
             const roofGeo = new THREE.ConeGeometry(5.2, 3, 4);
             roofGeo.rotateY(Math.PI / 4); 
-            const roofMat = new THREE.MeshStandardMaterial({ color: roofColor, flatShading: true }); 
+            const roofMat = new THREE.MeshStandardMaterial({ 
+                color: roofColor, 
+                roughness: 0.8,
+                metalness: 0.1
+            });
             const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.castShadow = true;
+            roof.receiveShadow = true;
             roof.position.y = 5.5; 
             houseGroup.add(roof);
 
             const snowCapGeo = new THREE.ConeGeometry(5.3, 1, 4);
             snowCapGeo.rotateY(Math.PI / 4);
-            const snowCap = new THREE.Mesh(snowCapGeo, new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.9}));
+            const snowCap = new THREE.Mesh(snowCapGeo, new THREE.MeshStandardMaterial({
+                color: env === 'seaside' ? 0xFFFFFF : (env === 'desert' ? 0xE8BF5C : 0xf8f8f8),
+                roughness: 0.7
+            }));
+            snowCap.castShadow = true;
+            snowCap.receiveShadow = true;
             snowCap.position.y = 6.5;
             houseGroup.add(snowCap);
 
             const doorGeo = new THREE.PlaneGeometry(1.2, 2.2);
-            const doorMat = new THREE.MeshStandardMaterial({ color: 0x3d2b24 }); 
+            const doorMat = new THREE.MeshStandardMaterial({ 
+                color: env === 'seaside' ? 0x8B0000 : (env === 'desert' ? 0x8B4513 : 0x5d4e37),
+                roughness: 0.8
+            }); 
             const door = new THREE.Mesh(doorGeo, doorMat);
+            door.receiveShadow = true;
             
             const doorWalls = ['front', 'back', 'left', 'right'];
             const doorWall = doorWalls[Math.floor(Math.random() * doorWalls.length)];
@@ -319,7 +813,13 @@
             houseGroup.add(door);
 
             const winGeo = new THREE.PlaneGeometry(1, 1);
-            const winMat = new THREE.MeshStandardMaterial({ color: 0xbcd2db, emissive: 0xffe6a3, emissiveIntensity: 0.4 }); 
+            const winMat = new THREE.MeshStandardMaterial({ 
+                color: env === 'seaside' ? 0x87CEEB : (env === 'desert' ? 0xFFFFCC : 0x87ceeb),
+                emissive: env === 'seaside' ? 0xFFD700 : (env === 'desert' ? 0xFFD700 : 0xffeb3b),
+                emissiveIntensity: 0.3,
+                metalness: 0.3,
+                roughness: 0.2
+            }); 
             const numWinWalls = 1 + Math.floor(Math.random() * 3);
             const availableWalls = ['front', 'back', 'left', 'right'].filter(w => w !== doorWall);
             
@@ -333,6 +833,7 @@
                 const numWinsOnWall = 1 + Math.floor(Math.random() * 2);
                 for (let i = 0; i < numWinsOnWall; i++) {
                     const win = new THREE.Mesh(winGeo, winMat);
+                    win.receiveShadow = true;
                     const offset = numWinsOnWall === 1 ? 0 : (i === 0 ? -1.8 : 1.8);
                     if (wall === 'front') win.position.set(offset, 2.2, 3.01);
                     else if (wall === 'back') { win.position.set(offset, 2.2, -3.01); win.rotation.y = Math.PI; }
@@ -347,41 +848,80 @@
 
         function generateCarMesh(customColor) {
             const carGroup = new THREE.Group();
-            const paintMat = new THREE.MeshStandardMaterial({color: customColor, roughness: 0.5});
-            const windowMat = new THREE.MeshStandardMaterial({ color: 0x9fa4a6, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+            const paintMat = new THREE.MeshStandardMaterial({
+                color: customColor,
+                roughness: 0.4,
+                metalness: 0.6
+            });
+            const windowMat = new THREE.MeshStandardMaterial({ 
+                color: 0x87ceeb,
+                transparent: true,
+                opacity: 0.5,
+                metalness: 0.4,
+                roughness: 0.1,
+                side: THREE.DoubleSide
+            });
             
             const body = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.6, 4.2), paintMat);
+            body.castShadow = true;
+            body.receiveShadow = true;
             body.position.y = 0.6;
+
             const hood = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.1), paintMat);
-            hood.position.set(0, 1.05, 0.9); hood.rotation.x = 0.8;
+            hood.castShadow = true;
+            hood.receiveShadow = true;
+            hood.position.set(0, 1.05, 0.9);
+            hood.rotation.x = 0.8;
+
             const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.9, 2.1), paintMat);
+            cabin.castShadow = true;
+            cabin.receiveShadow = true;
             cabin.position.set(0, 1.25, -0.3);
+
             const trunk = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.1), paintMat);
-            trunk.position.set(0, 1.05, -1.4); trunk.rotation.x = -0.8;
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            trunk.position.set(0, 1.05, -1.4);
+            trunk.rotation.x = -0.8;
             carGroup.add(body, hood, cabin, trunk);
 
             const frontWin = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), windowMat);
-            frontWin.position.set(0, 1.35, 1.2); frontWin.rotation.x = 15; 
+            frontWin.receiveShadow = true;
+            frontWin.position.set(0, 1.35, 1.2);
+            frontWin.rotation.x = 15; 
             carGroup.add(frontWin);
             
             const backWin = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), windowMat);
-            backWin.position.set(0, 1.35, -1.7); backWin.rotation.x = -15; 
+            backWin.receiveShadow = true;
+            backWin.position.set(0, 1.35, -1.7);
+            backWin.rotation.x = -15; 
             carGroup.add(backWin);
 
             const sideWinGeo = new THREE.PlaneGeometry(1.8, 0.6);
             const leftWin = new THREE.Mesh(sideWinGeo, windowMat);
-            leftWin.position.set(-0.91, 1.25, -0.3); leftWin.rotation.y = Math.PI / 2;
+            leftWin.receiveShadow = true;
+            leftWin.position.set(-0.91, 1.25, -0.3);
+            leftWin.rotation.y = Math.PI / 2;
             carGroup.add(leftWin);
 
             const rightWin = new THREE.Mesh(sideWinGeo, windowMat);
-            rightWin.position.set(0.91, 1.25, -0.3); rightWin.rotation.y = -Math.PI / 2;
+            rightWin.receiveShadow = true;
+            rightWin.position.set(0.91, 1.25, -0.3);
+            rightWin.rotation.y = -Math.PI / 2;
             carGroup.add(rightWin);
 
-            const tireMat = new THREE.MeshStandardMaterial({color: 0x111111});
-            const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.2, 12); wheelGeo.rotateZ(Math.PI / 2);
+            const tireMat = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.8,
+                metalness: 0.1
+            });
+            const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.2, 16);
+            wheelGeo.rotateZ(Math.PI / 2);
             const positions = [[-0.95, 1.3], [0.95, 1.3], [-0.95, -1.3], [0.95, -1.3]];
             positions.forEach(p => {
                 const w = new THREE.Mesh(wheelGeo, tireMat);
+                w.castShadow = true;
+                w.receiveShadow = true;
                 w.position.set(p[0], 0.38, p[1]);
                 carGroup.add(w);
             });
@@ -395,16 +935,19 @@
 
             const grassFloor = new THREE.Mesh(grassGeo, grassMat);
             grassFloor.rotation.x = -Math.PI / 2;
+            grassFloor.receiveShadow = true;
             chunk.add(grassFloor);
 
             const highwayZ = new THREE.Mesh(roadZGeo, roadMat);
             highwayZ.rotation.x = -Math.PI / 2;
             highwayZ.position.y = 0.01;
+            highwayZ.receiveShadow = true;
             chunk.add(highwayZ);
 
             const highwayX = new THREE.Mesh(roadXGeo, roadMat);
             highwayX.rotation.x = -Math.PI / 2;
-            highwayX.position.y = 0.015; 
+            highwayX.position.y = 0.015;
+            highwayX.receiveShadow = true;
             chunk.add(highwayX);
 
             const linesPerChunk = chunkSize / 20;
@@ -437,10 +980,12 @@
                 for (let s = -2; s <= 2; s++) {
                     const stripe = new THREE.Mesh(zebraStripeGeo, zebraStripeMat);
                     stripe.position.set(s * 2.2, 0, 0);
+                    stripe.receiveShadow = true;
                     crosswalkGroup.add(stripe);
                 }
                 crosswalkGroup.position.set(pos.x, 0.028, pos.z);
-                crosswalkGroup.rotation.x = -Math.PI / 2; crosswalkGroup.rotation.z = pos.rot;
+                crosswalkGroup.rotation.x = -Math.PI / 2;
+                crosswalkGroup.rotation.z = pos.rot;
                 chunk.add(crosswalkGroup);
             });
 
@@ -451,20 +996,20 @@
                 const z = (25 + Math.random() * 60) * sideZ;
                 const worldPos = new THREE.Vector3(chunk.position.x + x, 0, chunk.position.z + z);
                 if (Math.random() > 0.85) { 
-                    const house = createHouse();
+                    const house = createHouse(window.selectedEnvironment);
                     house.position.set(x, 0, z);
                     house.rotation.y = Math.atan2(x, z);
                     chunk.add(house);
                     chunk.userData.localHitboxes.push({ position: worldPos, radius: 4.8, type: 'house' });
                 } else {
-                    const t = createTree();
+                    const t = createTree(window.selectedEnvironment);
                     t.position.set(x, 0, z);
                     chunk.add(t);
                     chunk.userData.localHitboxes.push({ position: worldPos, radius: 1.8, type: 'tree' });
                 }
             }
 
-            const carColors = [0x505458, 0x3c3f42, 0x80858a, 0xa82222, 0x1a2430, 0x2e4235, 0x403d33, 0x141414];
+            const carColors = [0x505458, 0x3c3f42, 0x80858a, 0xe84c3d, 0x1a3c5c, 0x2d5a3d, 0x4a3d33, 0x1a1a1a];
             
             if (Math.random() > 0.4) { 
                 const aiColor = carColors[Math.floor(Math.random() * carColors.length)];
@@ -474,7 +1019,7 @@
                 aiVehicle.position.set(worldX, 0, worldZ);
                 
                 const baseSpeed = 0.35 + Math.random() * 0.15;
-                aiVehicle.rotation.y = 0; 
+                aiVehicle.rotation.y = 0;
                 aiVehicle.userData = {
                     dirX: 0, dirZ: 1,
                     speed: baseSpeed, maxSpeed: baseSpeed,
@@ -492,7 +1037,7 @@
                 aiVehicle.position.set(worldX, 0, worldZ);
                 
                 const baseSpeed = 0.35 + Math.random() * 0.15;
-                aiVehicle.rotation.y = Math.PI / 2; 
+                aiVehicle.rotation.y = Math.PI / 2;
                 aiVehicle.userData = {
                     dirX: 1, dirZ: 0,
                     speed: baseSpeed, maxSpeed: baseSpeed,
@@ -533,21 +1078,56 @@
 
         // --- AE86 Chassis Assembly ---
         const car = new THREE.Group();
-        const whitePaint = new THREE.MeshStandardMaterial({color: 0xeeeeee, roughness: 0.4});
-        const blackTrim = new THREE.MeshStandardMaterial({color: 0x151515, roughness: 0.7});
-        const glassMat = new THREE.MeshStandardMaterial({ color: 0x222222, transparent: true, opacity: 2, side: THREE.DoubleSide });
-        const stickerMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6 });
+        const whitePaint = new THREE.MeshStandardMaterial({
+            color: 0xf5f5f5,
+            roughness: 0.35,
+            metalness: 0.6
+        });
+        const blackTrim = new THREE.MeshStandardMaterial({
+            color: 0x1a1a1a,
+            roughness: 0.6,
+            metalness: 0.2
+        });
+        const glassMat = new THREE.MeshStandardMaterial({ 
+            color: 0x87ceeb,
+            transparent: true,
+            opacity: 0.4,
+            metalness: 0.3,
+            roughness: 0.1,
+            side: THREE.DoubleSide
+        });
+        const stickerMat = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a1a,
+            roughness: 0.7,
+            metalness: 0.1
+        });
         
         const lowerChassis = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.2, 4.3), blackTrim);
+        lowerChassis.castShadow = true;
+        lowerChassis.receiveShadow = true;
         lowerChassis.position.y = 0.4;
+
         const upperBody = new THREE.Mesh(new THREE.BoxGeometry(1.98, 0.4, 4.2), whitePaint);
+        upperBody.castShadow = true;
+        upperBody.receiveShadow = true;
         upperBody.position.y = 0.7;
+
         const hood = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.1), whitePaint);
-        hood.position.set(0, 1.05, 0.7); hood.rotation.x = 0.9;
+        hood.castShadow = true;
+        hood.receiveShadow = true;
+        hood.position.set(0, 1.05, 0.7);
+        hood.rotation.x = 0.9;
+
         const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.2, 2.1), whitePaint);
+        cabin.castShadow = true;
+        cabin.receiveShadow = true;
         cabin.position.set(0, 1.1, -0.4);
+
         const trunkMesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.1), whitePaint);
-        trunkMesh.position.set(0, 1.05, -1.4); trunkMesh.rotation.x = -0.9;
+        trunkMesh.castShadow = true;
+        trunkMesh.receiveShadow = true;
+        trunkMesh.position.set(0, 1.05, -1.4);
+        trunkMesh.rotation.x = -0.9;
         
         const blackHood = new THREE.Mesh(new THREE.BoxGeometry(1.82, 0.02, 1.0), blackTrim);
         blackHood.position.set(0, 0.91, 1.6);
@@ -559,9 +1139,11 @@
 
         // Stripes
         const leftSticker = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.08), stickerMat);
-        leftSticker.position.set(-1.0, 0.65, -0.1); leftSticker.rotation.y = -Math.PI / 2;
+        leftSticker.position.set(-1.0, 0.65, -0.1);
+        leftSticker.rotation.y = -Math.PI / 2;
         const rightSticker = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.08), stickerMat);
-        rightSticker.position.set(1.0, 0.65, -0.1); rightSticker.rotation.y = Math.PI / 2;
+        rightSticker.position.set(1.0, 0.65, -0.1);
+        rightSticker.rotation.y = Math.PI / 2;
         const frontSticker = new THREE.Mesh(new THREE.PlaneGeometry(1.98, 0.08), stickerMat);
         frontSticker.position.set(0, 0.65, 2.15);
         const backSticker = new THREE.Mesh(new THREE.PlaneGeometry(1.98, 0.08), stickerMat);
@@ -570,9 +1152,15 @@
         
         // Windows
         const frontWinShape = new THREE.Shape();
-        frontWinShape.moveTo(-0.9, -0.3); frontWinShape.lineTo(-0.05, -0.3); frontWinShape.lineTo(-0.05, 0.3); frontWinShape.lineTo(-0.6, 0.3);   
+        frontWinShape.moveTo(-0.9, -0.3);
+        frontWinShape.lineTo(-0.05, -0.3);
+        frontWinShape.lineTo(-0.05, 0.3);
+        frontWinShape.lineTo(-0.6, 0.3);   
         const rearWinShape = new THREE.Shape();
-        rearWinShape.moveTo(0.05, -0.3); rearWinShape.lineTo(0.9, -0.3); rearWinShape.lineTo(0.6, 0.3); rearWinShape.lineTo(0.05, 0.3);   
+        rearWinShape.moveTo(0.05, -0.3);
+        rearWinShape.lineTo(0.9, -0.3);
+        rearWinShape.lineTo(0.6, 0.3);
+        rearWinShape.lineTo(0.05, 0.3);   
         const frontWinGeo = new THREE.ShapeGeometry(frontWinShape);
         const rearWinGeo = new THREE.ShapeGeometry(rearWinShape);
         
@@ -580,56 +1168,89 @@
             const xPos = side === 'left' ? -0.91 : 0.91;
             const rotY = side === 'left' ? Math.PI / 2 : -Math.PI / 2;
             const fWin = new THREE.Mesh(frontWinGeo, glassMat);
-            fWin.position.set(xPos, 1.25, -0.2); fWin.rotation.y = rotY;
+            fWin.receiveShadow = true;
+            fWin.position.set(xPos, 1.25, -0.2);
+            fWin.rotation.y = rotY;
             car.add(fWin);
             const rWin = new THREE.Mesh(rearWinGeo, glassMat);
-            rWin.position.set(xPos, 1.25, -0.2); rWin.rotation.y = rotY;
+            rWin.receiveShadow = true;
+            rWin.position.set(xPos, 1.25, -0.2);
+            rWin.rotation.y = rotY;
             car.add(rWin);
         };
-        addSideWindows('left'); addSideWindows('right');
+        addSideWindows('left');
+        addSideWindows('right');
 
         const frontWin = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), glassMat);
-        frontWin.position.set(0, 1.35, 1); frontWin.rotation.x = 15; car.add(frontWin);
+        frontWin.receiveShadow = true;
+        frontWin.position.set(0, 1.35, 1);
+        frontWin.rotation.x = 15;
+        car.add(frontWin);
+
         const backWin = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), glassMat);
-        backWin.position.set(0, 1.35, -1.7); backWin.rotation.x = -15; car.add(backWin);
+        backWin.receiveShadow = true;
+        backWin.position.set(0, 1.35, -1.7);
+        backWin.rotation.x = -15;
+        car.add(backWin);
 
         // Rear
         const rearTrim = new THREE.Mesh(new THREE.BoxGeometry(1.98, 0.25, 0.02), blackTrim);
         rearTrim.position.set(0, 0.7, -2.16);
         const tailLightGeo = new THREE.PlaneGeometry(0.7, 0.15);
-        const tailLightMat = new THREE.MeshStandardMaterial({ color: 0x990000, emissive: 0x550000 });
-        const leftLight = new THREE.Mesh(tailLightGeo, tailLightMat); leftLight.position.set(-0.5, 0.7, -2.18); leftLight.rotation.y = Math.PI;
-        const rightLight = leftLight.clone(); rightLight.position.x = 0.5;
+        const tailLightMat = new THREE.MeshStandardMaterial({ 
+            color: 0x8b0000,
+            emissive: 0xff0000,
+            emissiveIntensity: 0.5,
+            metalness: 0.3
+        });
+        const leftLight = new THREE.Mesh(tailLightGeo, tailLightMat);
+        leftLight.position.set(-0.5, 0.7, -2.18);
+        leftLight.rotation.y = Math.PI;
+        const rightLight = leftLight.clone();
+        rightLight.position.x = 0.5;
         car.add(rearTrim, leftLight, rightLight);
 
-        // --- POP-UP LIGHT ASSEMBLIES (UPGRADED BRIGHTNESS) ---
+        // --- POP-UP LIGHT ASSEMBLIES ---
         let headlightsOpen = false;
         let headlightTargetRot = 0;
         let headlightCurrentRot = 0;
 
-        const leftPod = new THREE.Group(); leftPod.position.set(-0.55, 0.90, 1.82);
-        const rightPod = new THREE.Group(); rightPod.position.set(0.55, 0.90, 1.82);
+        const leftPod = new THREE.Group();
+        leftPod.position.set(-0.55, 0.90, 1.82);
+        const rightPod = new THREE.Group();
+        rightPod.position.set(0.55, 0.90, 1.82);
 
         const podCoverGeo = new THREE.BoxGeometry(0.48, 0.16, 0.4);
-        const leftCover = new THREE.Mesh(podCoverGeo, blackTrim); leftCover.position.set(0, 0, -0.1); leftPod.add(leftCover);
-        const rightCover = new THREE.Mesh(podCoverGeo, blackTrim); rightCover.position.set(0, 0, -0.1); rightPod.add(rightCover);
+        const leftCover = new THREE.Mesh(podCoverGeo, blackTrim);
+        leftCover.castShadow = true;
+        leftCover.position.set(0, 0, -0.1);
+        leftPod.add(leftCover);
+        const rightCover = new THREE.Mesh(podCoverGeo, blackTrim);
+        rightCover.castShadow = true;
+        rightCover.position.set(0, 0, -0.1);
+        rightPod.add(rightCover);
 
-        // Standard Material with Glowing Emissive setup for the physical headlight bulb
         const bulbGeo = new THREE.PlaneGeometry(0.42, 0.1);
         const bulbMat = new THREE.MeshStandardMaterial({
-            color: 0x000000, 
+            color: 0x000000,
             roughness: 0.1,
             emissive: 0xfffee5,
-            emissiveIntensity: 0.0
+            emissiveIntensity: 0.0,
+            metalness: 0.5
         }); 
-        const leftBulb = new THREE.Mesh(bulbGeo, bulbMat); leftBulb.position.set(0, -0.04, 0.101); leftPod.add(leftBulb);
-        const rightBulb = leftBulb.clone(); rightPod.add(rightBulb);
+        const leftBulb = new THREE.Mesh(bulbGeo, bulbMat);
+        leftBulb.position.set(0, -0.04, 0.101);
+        leftPod.add(leftBulb);
+        const rightBulb = leftBulb.clone();
+        rightPod.add(rightBulb);
 
-        // SpotLight with high intensity and range to cut through fog
         const createBeamSource = (offsetX) => {
-            const spot = new THREE.SpotLight(0xfffaed, 0, 80, Math.PI / 4.5, 0.5, 1);
+            const spot = new THREE.SpotLight(0xfffaed, 0, 100, Math.PI / 4, 0.5, 2);
             spot.position.set(offsetX, 1.0, 2.1);
-            spot.target.position.set(offsetX, 0.5, 25);
+            spot.target.position.set(offsetX, 0.5, 30);
+            spot.castShadow = true;
+            spot.shadow.mapSize.width = 1024;
+            spot.shadow.mapSize.height = 1024;
             return spot;
         };
         const leftBeam = createBeamSource(-0.55);
@@ -645,9 +1266,9 @@
                 toggleBtn.textContent = "Lights: ON";
                 toggleBtn.classList.add('active-panel');
                 bulbMat.color.setHex(0xfffee5);
-                bulbMat.emissiveIntensity = 2.5; // Visible glowing flare on the chassis bulb mesh
-                leftBeam.intensity = 350;        // Drastically increased from 15 to illuminate the field
-                rightBeam.intensity = 350;
+                bulbMat.emissiveIntensity = 2.5;
+                leftBeam.intensity = 400;
+                rightBeam.intensity = 400;
             } else {
                 toggleBtn.textContent = "Lights: OFF";
                 toggleBtn.classList.remove('active-panel');
@@ -662,34 +1283,73 @@
 
         // Wheels
         const wheels = [];
-        const tireGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.2, 20); tireGeo.rotateZ(Math.PI / 2);
-        const rimGeo = new THREE.CylinderGeometry(0.20, 0.20, 0.2, 16); rimGeo.rotateZ(Math.PI / 2);
-        const tireMat = new THREE.MeshStandardMaterial({color: 0x111111});
-        const rimMat = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 0.7, roughness: 0.2}); 
+        const tireGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.2, 20);
+        tireGeo.rotateZ(Math.PI / 2);
+        const rimGeo = new THREE.CylinderGeometry(0.20, 0.20, 0.2, 16);
+        rimGeo.rotateZ(Math.PI / 2);
+        const tireMat = new THREE.MeshStandardMaterial({
+            color: 0x0a0a0a,
+            roughness: 0.8,
+            metalness: 0.1
+        });
+        const rimMat = new THREE.MeshStandardMaterial({
+            color: 0xcccccc,
+            metalness: 0.9,
+            roughness: 0.15
+        });
 
         const spawnWheel = (x, z, id) => {
             const group = new THREE.Group();
-            group.add(new THREE.Mesh(tireGeo, tireMat), new THREE.Mesh(rimGeo, rimMat));
-            group.position.set(x, 0.32, z); car.add(group);
+            const tire = new THREE.Mesh(tireGeo, tireMat);
+            const rim = new THREE.Mesh(rimGeo, rimMat);
+            tire.castShadow = true;
+            tire.receiveShadow = true;
+            rim.castShadow = true;
+            rim.receiveShadow = true;
+            group.add(tire, rim);
+            group.position.set(x, 0.32, z);
+            car.add(group);
             return { group, id };
         };
         wheels.push(spawnWheel(-0.95, 1.3, 'fl'), spawnWheel(0.95, 1.3, 'fr'), spawnWheel(-0.95, -1.3, 'rl'), spawnWheel(0.95, -1.3, 'rr'));
         scene.add(car);
 
-        const exhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.5, 8), new THREE.MeshStandardMaterial({color: 0x777777, metalness: 0.8}));
-        exhaustPipe.rotation.x = Math.PI / 2; exhaustPipe.position.set(0.6, 0.25, -2.15); car.add(exhaustPipe);
+        const exhaustPipe = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.08, 0.08, 0.5, 8),
+            new THREE.MeshStandardMaterial({
+                color: 0x555555,
+                metalness: 0.9,
+                roughness: 0.3
+            })
+        );
+        exhaustPipe.castShadow = true;
+        exhaustPipe.rotation.x = Math.PI / 2;
+        exhaustPipe.position.set(0.6, 0.25, -2.15);
+        car.add(exhaustPipe);
 
         const smokeParticles = [];
         const smokeGeo = new THREE.SphereGeometry(0.2, 6, 6);
-        const smokeMat = new THREE.MeshBasicMaterial({ color: 0xdddddd, transparent: true, opacity: 0.25 }); 
+        const smokeMat = new THREE.MeshBasicMaterial({ 
+            color: 0xdddddd,
+            transparent: true,
+            opacity: 0.25
+        }); 
 
         function createSmoke() {
             const p = new THREE.Mesh(smokeGeo, smokeMat.clone());
-            const vector = new THREE.Vector3(0.6, 0.25, -2.3); vector.applyMatrix4(car.matrixWorld); p.position.copy(vector);
-            p.life = 1.0; scene.add(p); smokeParticles.push(p);
+            const vector = new THREE.Vector3(0.6, 0.25, -2.3);
+            vector.applyMatrix4(car.matrixWorld);
+            p.position.copy(vector);
+            p.life = 1.0;
+            scene.add(p);
+            smokeParticles.push(p);
         }
 
-        const driftSmokeMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.45 }); 
+        const driftSmokeMat = new THREE.MeshBasicMaterial({ 
+            color: 0xfafafa,
+            transparent: true,
+            opacity: 0.5
+        }); 
         function createDriftSmoke(wheelObj) {
             const smokeGeoSmaller = new THREE.SphereGeometry(0.15 + Math.random() * 0.12, 5, 5);
             const p = new THREE.Mesh(smokeGeoSmaller, driftSmokeMat.clone());
@@ -706,23 +1366,71 @@
             smokeParticles.push(p);
         }
 
+        // --- NITRO BOOST PARTICLES ---
+        function createNitroFlare(wheelObj) {
+            const flareGeo = new THREE.SphereGeometry(0.25 + Math.random() * 0.15, 6, 6);
+            const hue = 0.6 + Math.random() * 0.1;
+            const flareMat = new THREE.MeshBasicMaterial({ 
+                color: new THREE.Color().setHSL(hue, 1, 0.5 + Math.random() * 0.3),
+                transparent: true, 
+                opacity: 0.8
+            });
+            const p = new THREE.Mesh(flareGeo, flareMat);
+            const wheelWorldPos = new THREE.Vector3(); 
+            wheelObj.group.getWorldPosition(wheelWorldPos);
+            
+            p.position.set(wheelWorldPos.x + (Math.random() - 0.5) * 0.3, 0.1, wheelWorldPos.z + (Math.random() - 0.5) * 0.3);
+            p.life = 0.8; 
+            p.userData = {
+                vx: (Math.random() - 0.5) * 0.08 - Math.sin(angle) * 0.3,
+                vz: (Math.random() - 0.5) * 0.08 - Math.cos(angle) * 0.3,
+                isNitro: true
+            };
+            scene.add(p); 
+            smokeParticles.push(p);
+        }
+
         const skidsTracked = []; 
         const maxSkids = 400; 
-        const skidGeometry = new THREE.PlaneGeometry(0.25, 0.4); skidGeometry.rotateX(-Math.PI / 2); 
-        const skidMaterial = new THREE.MeshBasicMaterial({ color: 0xc8ccce, transparent: true, opacity: 0.55 }); 
+        const skidGeometry = new THREE.PlaneGeometry(0.25, 0.4);
+        skidGeometry.rotateX(-Math.PI / 2); 
+        const skidMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xb0b0b0,
+            transparent: true,
+            opacity: 0.6
+        }); 
 
         function makeSkidSegment(wheelObj) {
             const segment = new THREE.Mesh(skidGeometry, skidMaterial);
-            const wheelWorldPos = new THREE.Vector3(); wheelObj.group.getWorldPosition(wheelWorldPos);
-            segment.position.set(wheelWorldPos.x, 0.02, wheelWorldPos.z); segment.rotation.y = car.rotation.y;
-            scene.add(segment); skidsTracked.push(segment);
-            if(skidsTracked.length > maxSkids) { const old = skidsTracked.shift(); scene.remove(old); old.geometry.dispose(); }
+            const wheelWorldPos = new THREE.Vector3();
+            wheelObj.group.getWorldPosition(wheelWorldPos);
+            segment.position.set(wheelWorldPos.x, 0.02, wheelWorldPos.z);
+            segment.rotation.y = car.rotation.y;
+            segment.receiveShadow = true;
+            scene.add(segment);
+            skidsTracked.push(segment);
+            if(skidsTracked.length > maxSkids) {
+                const old = skidsTracked.shift();
+                scene.remove(old);
+                old.geometry.dispose();
+            }
         }
 
         // --- INPUTS AND GEAR SYSTEMS ---
-        const input = { gas: false, left: false, right: false };
+        const input = { gas: false, left: false, right: false, nitro: false };
         const GEARS = { DRIVE: 'D', NEUTRAL: 'N', REVERSE: 'R' };
         let currentGear = GEARS.DRIVE;
+
+        // --- NITRO SYSTEM ---
+        let nitroCharge = 100;
+        let maxNitro = 100;
+        let nitroCooldown = 0;
+        let isNitroActive = false;
+        let driftPoints = 0;
+        let driftMultiplier = 1.0;
+        let driftTimer = 0;
+        let totalDistance = 0;
+        let sessionTime = 0;
 
         function bind(id, prop) {
             const el = document.getElementById(id);
@@ -737,7 +1445,10 @@
             el.addEventListener('mousedown', set(true)); 
             el.addEventListener('mouseup', set(false));
         }
-        bind('btn-gas', 'gas'); bind('btn-left', 'left'); bind('btn-right', 'right');
+        bind('btn-gas', 'gas');
+        bind('btn-left', 'left');
+        bind('btn-right', 'right');
+        bind('btn-nitro', 'nitro');
         
         function setGear(gear) {
             initAudio();
@@ -757,11 +1468,20 @@
 
         const speedNumEl = document.getElementById('speed-num');
         const needleEl = document.getElementById('clock-needle');
+        const driftPointsEl = document.getElementById('drift-points');
+        const driftComboEl = document.getElementById('drift-combo');
+        const nitroBarFill = document.getElementById('nitro-bar-fill');
+        const nitroStatusEl = document.getElementById('nitro-status');
+        const distanceEl = document.getElementById('stat-distance');
+        const timeEl = document.getElementById('stat-time');
+        const redlineWarning = document.getElementById('redline-warning');
+        const comboMultiplierEl = document.getElementById('combo-multiplier');
 
         window.addEventListener('keydown', (e) => { initAudio();
             if(e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') input.gas = true;
             if(e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') input.left = true;
             if(e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') input.right = true;
+            if(e.key.toLowerCase() === 'x') input.nitro = true;
             
             if(e.key.toLowerCase() === 'e') setGear(GEARS.DRIVE);
             if(e.key.toLowerCase() === 'q') setGear(GEARS.NEUTRAL);
@@ -773,6 +1493,7 @@
             if(e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') input.gas = false;
             if(e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') input.left = false;
             if(e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') input.right = false;
+            if(e.key.toLowerCase() === 'x') input.nitro = false;
         });
 
         // --- CAMERA STATE SYSTEM ---
@@ -815,6 +1536,8 @@
                         car.position.x = obj.position.x + Math.sin(angleNormal) * minDist;
                         car.position.z = obj.position.z + Math.cos(angleNormal) * minDist;
                         speed = -speed * 0.4; 
+                        driftPoints = 0;
+                        driftMultiplier = 1.0;
                         return;
                     }
                 }
@@ -837,6 +1560,8 @@
                     car.position.x = aiCar.position.x + Math.sin(angleNormal) * minCarDist;
                     car.position.z = aiCar.position.z + Math.cos(angleNormal) * minCarDist;
                     speed = -speed * 0.4;
+                    driftPoints = 0;
+                    driftMultiplier = 1.0;
                     return;
                 }
             }
@@ -929,31 +1654,31 @@
                 camera.rotation.set(-Math.PI / 2, 0, 0);
             }
 
-            // --- GLOBAL MAP TRACKING SNOWFALL LOOP ---
-            const positions = snowGeometry.attributes.position.array;
-            const halfW = snowCoverageWidth / 2;
+            // --- WEATHER PARTICLES LOOP ---
+            const positions = particleGeometry.attributes.position.array;
+            const halfW = particleCoverageWidth / 2;
 
-            for (let i = 0; i < snowCount; i++) {
-                positions[i * 3 + 1] -= snowVelocities[i].y; 
-                positions[i * 3] += snowVelocities[i].x;     
-                positions[i * 3 + 2] += snowVelocities[i].z; 
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3 + 1] -= particleVelocities[i].y; 
+                positions[i * 3] += particleVelocities[i].x;     
+                positions[i * 3 + 2] += particleVelocities[i].z; 
 
                 const relativeX = positions[i * 3] - camera.position.x;
                 const relativeZ = positions[i * 3 + 2] - camera.position.z;
 
                 if (positions[i * 3 + 1] < 0) {
                     positions[i * 3 + 1] = camera.position.y + (Math.random() * 30);
-                    positions[i * 3] = camera.position.x + (Math.random() - 0.5) * snowCoverageWidth;
-                    positions[i * 3 + 2] = camera.position.z + (Math.random() - 0.5) * snowCoverageWidth;
+                    positions[i * 3] = camera.position.x + (Math.random() - 0.5) * particleCoverageWidth;
+                    positions[i * 3 + 2] = camera.position.z + (Math.random() - 0.5) * particleCoverageWidth;
                 }
                 
-                if (relativeX > halfW) positions[i * 3] -= snowCoverageWidth;
-                else if (relativeX < -halfW) positions[i * 3] += snowCoverageWidth;
+                if (relativeX > halfW) positions[i * 3] -= particleCoverageWidth;
+                else if (relativeX < -halfW) positions[i * 3] += particleCoverageWidth;
 
-                if (relativeZ > halfW) positions[i * 3 + 2] -= snowCoverageWidth;
-                else if (relativeZ < -halfW) positions[i * 3 + 2] += snowCoverageWidth;
+                if (relativeZ > halfW) positions[i * 3 + 2] -= particleCoverageWidth;
+                else if (relativeZ < -halfW) positions[i * 3 + 2] += particleCoverageWidth;
             }
-            snowGeometry.attributes.position.needsUpdate = true;
+            particleGeometry.attributes.position.needsUpdate = true;
 
             headlightCurrentRot = THREE.MathUtils.lerp(headlightCurrentRot, headlightTargetRot, 0.12);
             leftPod.rotation.x = headlightCurrentRot;
@@ -983,6 +1708,30 @@
                 });
             }
 
+            // --- NITRO BOOST LOGIC ---
+            if (input.nitro && nitroCharge > 0 && nitroCooldown <= 0) {
+                speed *= 1.035;
+                nitroCharge -= 1.5;
+                isNitroActive = true;
+                driftPoints += 0.5 * driftMultiplier;
+
+                wheels.forEach((w, i) => {
+                    if (i % 2 === 0) createNitroFlare(w);
+                });
+
+                if (window.audioCtxInitialized && window.nitroOsc) {
+                    window.nitroGain.gain.value = 0.15;
+                    window.nitroOsc.frequency.value = 800 + Math.sin(performance.now() * 0.005) * 200;
+                }
+            } else {
+                isNitroActive = false;
+                nitroCooldown--;
+                nitroCharge = Math.min(nitroCharge + 0.3, maxNitro);
+                if (window.audioCtxInitialized && window.nitroOsc) {
+                    window.nitroGain.gain.value = 0;
+                }
+            }
+
             if (input.gas) {
                 if (currentGear === GEARS.DRIVE) speed += 0.029;
                 else if (currentGear === GEARS.REVERSE) speed -= 0.015;
@@ -996,34 +1745,53 @@
             car.position.x += Math.sin(angle) * speed; 
             car.position.z += Math.cos(angle) * speed;
             
+            totalDistance += Math.abs(speed) * 0.01;
+            sessionTime += 0.0167;
+
             checkPlayerCollisions();
             updateInfiniteChunks(car.position.x, car.position.z);
             
-            if (audioCtxInitialized) { 
+            if (window.audioCtxInitialized) { 
                 const absSpeed = Math.abs(speed);
                 if (input.gas && currentGear === GEARS.NEUTRAL) {
-                    engineOsc.frequency.value = 550 + (Math.random() * 20); 
+                    window.engineOsc.frequency.value = 550 + (Math.random() * 20); 
                 } else {
-                    engineOsc.frequency.value = 150 + (absSpeed * 400);
+                    window.engineOsc.frequency.value = 150 + (absSpeed * 400);
                 }
-                engineGain.gain.value = 1.05;  
+                window.engineGain.gain.value = 1.05;  
                 if ((input.left || input.right) && absSpeed > 0.15) { 
-                    driftGain.gain.value = THREE.MathUtils.lerp(driftGain.gain.value, 0.03, 0.2); 
-                    driftOsc.frequency.value = 1000 + (Math.random() * 50); 
+                    window.driftGain.gain.value = THREE.MathUtils.lerp(window.driftGain.gain.value, 0.03, 0.2); 
+                    window.driftOsc.frequency.value = 1000 + (Math.random() * 50); 
                 } else { 
-                    driftGain.gain.value = THREE.MathUtils.lerp(driftGain.gain.value, 0, 0.15); 
+                    window.driftGain.gain.value = THREE.MathUtils.lerp(window.driftGain.gain.value, 0, 0.15); 
                 }
             }
 
             const isDrifting = ((input.left || input.right) && Math.abs(speed) > 0.15) || (currentGear === GEARS.REVERSE && input.gas && speed < -0.1);
 
             if (isDrifting) { 
+                driftPoints += 0.25 * driftMultiplier;
+                driftTimer = 120;
+                driftMultiplier = Math.min(driftMultiplier + 0.02, 5.0);
+
                 wheels.forEach(w => { 
                     if(w.id.includes('r')) {
                         makeSkidSegment(w); 
                         createDriftSmoke(w);
                     } 
                 }); 
+            } else {
+                driftTimer--;
+                if (driftTimer <= 0) {
+                    if (driftMultiplier > 1.0) {
+                        const bonus = Math.floor(driftPoints * 0.1);
+                        driftPoints += bonus;
+                        comboMultiplierEl.textContent = `+${bonus}`;
+                        comboMultiplierEl.style.opacity = 1;
+                        setTimeout(() => { comboMultiplierEl.style.opacity = 0; }, 800);
+                    }
+                    driftMultiplier = 1.0;
+                }
             }
 
             const calculatedSpeedValue = Math.round(Math.abs(speed) * 100);
@@ -1032,6 +1800,24 @@
             const engineTopBoundEst = 100;
             const targetRotationDegrees = minGaugeAngle + (Math.min(calculatedSpeedValue, engineTopBoundEst) / engineTopBoundEst) * (maxGaugeAngle - minGaugeAngle);
             needleEl.style.transform = `translateX(-50%) rotate(${targetRotationDegrees}deg)`;
+
+            if (calculatedSpeedValue > 95) {
+                redlineWarning.classList.add('active');
+            } else {
+                redlineWarning.classList.remove('active');
+            }
+
+            // --- UI UPDATES ---
+            driftPointsEl.textContent = Math.floor(driftPoints);
+            driftComboEl.textContent = driftMultiplier.toFixed(1);
+            nitroBarFill.style.width = (nitroCharge / maxNitro) * 100 + '%';
+            nitroStatusEl.textContent = nitroCharge > 0 ? 'Ready' : 'Charging';
+            
+            const km = (totalDistance / 1000).toFixed(2);
+            distanceEl.textContent = km;
+            const mins = Math.floor(sessionTime / 60);
+            const secs = Math.floor(sessionTime % 60);
+            timeEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
             if(++smokeTimer > (input.gas ? 3 : 10)) { createSmoke(); smokeTimer = 0; }
             
@@ -1046,7 +1832,7 @@
                 }
                 
                 p.position.y += 0.015; 
-                p.material.opacity = p.life * (p.userData && p.userData.vx !== undefined ? 0.35 : 0.15); 
+                p.material.opacity = p.life * (p.userData && p.userData.isNitro ? 0.6 : (p.userData && p.userData.vx !== undefined ? 0.35 : 0.15)); 
                 
                 if(p.life <= 0) { 
                     scene.remove(p); 
@@ -1067,7 +1853,11 @@
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
         updateInfiniteChunks(0, 0); 
         animate();
     </script>
